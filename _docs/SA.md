@@ -194,27 +194,3 @@ curl -X POST "https://api.example.com/reviews" \
 | `created_at` | `TEXT DEFAULT (datetime('now')` | Дата создания |
 
 ---
-
-### **SQL-схема**  (sqlite) 
-
-
-```sql
-CREATE TABLE templates (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name VARCHAR(255) NOT NULL,
-    preview_link TEXT,
-    file_path TEXT NOT NULL,
-    created_at TEXT DEFAULT (datetime('now')),
-    updated_at TEXT DEFAULT (datetime('now'))
-);
-
-CREATE INDEX name_idx ON templates (name);
-
-CREATE TABLE reviews (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    email VARCHAR(255) NOT NULL,
-    title VARCHAR(255) NOT NULL,
-    body TEXT NOT NULL,
-    created_at TEXT DEFAULT (datetime('now'))
-);
-```
