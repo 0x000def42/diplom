@@ -6,7 +6,7 @@ class TemplateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Template
-        fields = ["id", "name", "preview_link", "file_url"]
+        fields = ["id", "name", "description", "file_url"]
 
     def get_file_url(self, obj):
         return obj.file.url if obj.file else None

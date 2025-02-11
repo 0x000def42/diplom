@@ -5,5 +5,5 @@ admin.site.register(Review)
 
 @admin.register(Template)
 class TemplateAdmin(admin.ModelAdmin):
-    list_display = ["id", "name", "preview_link", "file"]
-    search_fields = ["name"]
+    list_display = ["id", "name", "description", "file"]
+    search_fields = ["name", "description"]
