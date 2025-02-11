@@ -3,7 +3,7 @@ from django.db import models
 class Template(models.Model):
     name = models.CharField(max_length=255)
     preview_link = models.TextField()
-    file_path = models.TextField()
+    file = models.FileField(upload_to="templates/")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

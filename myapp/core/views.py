@@ -14,7 +14,7 @@ def template_list(request):
 @api_view(["GET"])
 def template_download(request, id):
     template = get_object_or_404(Template, id=id)
-    return FileResponse(open(template.file_path, "rb"), content_type="application/xml")
+    return FileResponse(template.file.open("rb"), content_type="application/xml")
 
 @api_view(["POST"])
 def create_review(request):

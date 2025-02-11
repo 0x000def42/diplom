@@ -1,5 +1,9 @@
 from django.contrib import admin
 from .models import Template, Review
 
-admin.site.register(Template)
 admin.site.register(Review)
+
+@admin.register(Template)
+class TemplateAdmin(admin.ModelAdmin):
+    list_display = ["id", "name", "preview_link", "file"]
+    search_fields = ["name"]
