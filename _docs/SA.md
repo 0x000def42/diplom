@@ -126,7 +126,7 @@ curl -X GET "https://api.example.com/template?query=торг"
 
 | Параметр  | Тип     | Обязательный | Описание                 |
 |-----------|---------|--------------|--------------------------|
-| `query`      | string  | Нет           | Подстрока для фильтра по названию |
+| `id`      | integer  | Да           | Идентификатор скачиваемого шаблона |
 #### Пример запроса:
 ```json
 curl -X GET "https://api.example.com/templates/123/download" \
@@ -161,7 +161,7 @@ curl -X POST "https://api.example.com/reviews" \
 #### Пример ответа:
 ```json
 {
-    "id": "456"
+    "id": 456
 }
 ```
 
