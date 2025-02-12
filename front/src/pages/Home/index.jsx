@@ -1,39 +1,57 @@
-import preactLogo from '../../assets/preact.svg';
 import './style.css';
+import { Header } from '../../components/Header';
+import Footer from '../../components/Footer';
+import { Typography, Container, Grid, Card, CardContent, CardMedia } from '@mui/material';
+
+const data = [
+  {
+    title: 'Card 1',
+    description: 'This is the first card.',
+    image: 'https://via.placeholder.com/150',
+  },
+  {
+    title: 'Card 2',
+    description: 'This is the second card.',
+    image: 'https://via.placeholder.com/150',
+  },
+  {
+    title: 'Card 3',
+    description: 'This is the third card.',
+    image: 'https://via.placeholder.com/150',
+  },
+];
 
 export function Home() {
-	return (
-		<div class="home">
-			<a href="https://preactjs.com" target="_blank">
-				<img src={preactLogo} alt="Preact logo" height="160" width="160" />
-			</a>
-			<h1>Get Started building Vite-powered Preact Apps </h1>
-			<section>
-				<Resource
-					title="Learn Preact"
-					description="If you're new to Preact, try the interactive tutorial to learn important concepts"
-					href="https://preactjs.com/tutorial"
-				/>
-				<Resource
-					title="Differences to React"
-					description="If you're coming from React, you may want to check out our docs to see where Preact differs"
-					href="https://preactjs.com/guide/v10/differences-to-react"
-				/>
-				<Resource
-					title="Learn Vite"
-					description="To learn more about Vite and how you can customize it to fit your needs, take a look at their excellent documentation"
-					href="https://vitejs.dev"
-				/>
-			</section>
-		</div>
-	);
-}
-
-function Resource(props) {
-	return (
-		<a href={props.href} target="_blank" class="resource">
-			<h2>{props.title}</h2>
-			<p>{props.description}</p>
-		</a>
-	);
+  return (
+    <div>
+      <Header />
+      <main>
+        <Container>
+          <Grid container spacing={4}>
+            {data.map((item) => (
+              <Grid item key={item.title} xs={12} sm={6} md={4}>
+                <Card>
+                  <CardMedia
+                    component="img"
+                    height="140"
+                    image={item.image}
+                    alt={item.title}
+                  />
+                  <CardContent>
+                    <Typography gutterBottom variant="h5" component="div">
+                      {item.title}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {item.description}
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
+        </Container>
+      </main>
+      <Footer />
+    </div>
+  );
 }
