@@ -1,19 +1,27 @@
 import React, { useEffect, useState } from 'react';
-import { AppBar, Toolbar, Typography, Container, Grid, Card, CardContent, CardMedia, Button } from '@mui/material';
+import { AppBar, Toolbar, Typography, Container, Grid2, Card, CardContent, CardMedia, Button } from '@mui/material';
 import { styled } from '@mui/system';
 import axios from 'axios';
 
 const CardImage = styled(CardMedia)({
-  width: '100%',
-  height: 200,
+  height: 300,
   objectFit: 'cover',
+  cursor: 'pointer',
 });
 
+const MyCard = styled(Card)({
+  cursor: 'pointer',
+  padding: 15,
+  '&:hover': {
+    background: "#eee",
+  },
+})
+
 const MainContainer = styled(Container)({
-  flex: 1,
   display: 'flex',
   flexDirection: 'column',
 });
+
 
 const Home = () => {
   const [templates, setTemplates] = useState([]);
@@ -34,24 +42,21 @@ const Home = () => {
   
   return (
       <MainContainer>
-        <Grid container spacing={3}>
+        <Grid2 container spacing={3}>
           {templates.map((item, index) => (
-            <Grid item key={index} xs={12} sm={6}>
-              <Card sx={{ mb: 3, boxShadow: 3 }}>
-                <CardImage component="img" image={item.image} alt={item.title} />
+            <Grid2 size={4}>
+              <MyCard>
+                <CardImage component="img" image={item.preview_url} alt={item.name} />
                 <CardContent>
-                  <Typography variant="h5">{item.title}</Typography>
+                  <Typography variant="h6">{item.name}</Typography>
                   <Typography variant="body2" color="text.secondary">
                     {item.description}
                   </Typography>
-                  <Button variant="contained" color="primary" sx={{ mt: 2 }}>
-                    Скачать
-                  </Button>
                 </CardContent>
-              </Card>
-            </Grid>
+              </MyCard>
+            </Grid2>
           ))}
-        </Grid>
+        </Grid2>
       </MainContainer>
   );
 }
