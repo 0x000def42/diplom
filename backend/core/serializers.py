@@ -18,4 +18,4 @@ class TemplateSerializer(serializers.ModelSerializer):
 class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
-        fields = ["id", "email", "title", "body"]
+        fields = ["email", "title", "body"]
