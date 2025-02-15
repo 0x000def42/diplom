@@ -1,5 +1,5 @@
 from django.shortcuts import get_object_or_404
-from django.http import FileResponse
+from django.http import FileResponse, HttpResponse
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from .models import Template, Review
@@ -23,3 +23,6 @@ def create_review(request):
         review = serializer.save()
         return Response({"id": review.id})
     return Response(serializer.errors, status=400)
+
+def home(request):
+    return HttpResponse("<h1>Welcome to the Homepage!</h1>")

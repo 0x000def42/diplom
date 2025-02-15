@@ -3,7 +3,7 @@ import { LocationProvider } from 'preact-iso';
 import { Router, Route } from 'preact-router'; // Importing Router
 
 import Layout from './components/Layout.jsx'; // Importing the Layout
-import { Home } from './pages/Home/index.jsx';
+import Home from './pages/Home/index.jsx';
 import { NotFound } from './pages/_404.jsx';
 
 export function App() {
