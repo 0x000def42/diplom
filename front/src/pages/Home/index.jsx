@@ -26,7 +26,7 @@ const MainContainer = styled(Container)({
 });
 
 
-const Home = () => {
+const Home = ({searchTerm}) => {
   const [templates, setTemplates] = useState([]);
   const [open, setOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState('');
@@ -35,7 +35,8 @@ const Home = () => {
   useEffect(() => {
     const fetchTemplates = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/api/templates/');
+        const url = `http://localhost:8000/api/templates/?query=${encodeURIComponent(searchTerm)}`;
+        const response = await axios.get(url);
         console.log('Fetched templates:', response.data);
         setTemplates(response.data);
       } catch (error) {

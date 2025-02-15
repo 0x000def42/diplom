@@ -1,17 +1,25 @@
 import { render } from 'preact';
 import { LocationProvider } from 'preact-iso';
-import { Router, Route } from 'preact-router'; // Importing Router
+import { Router, Route } from 'preact-router';
 
-import Layout from './components/Layout.jsx'; // Importing the Layout
+import { useState } from 'preact/hooks';
+
+import Layout from './components/Layout.jsx';
 import Home from './pages/Home/index.jsx';
 import { NotFound } from './pages/_404.jsx';
 
 export function App() {
+	const [searchTerm, setSearchTerm] = useState('');
+
+	const handleSearchChange = (event) => {
+		setSearchTerm(event.target.value);
+	};
+
 	return (
 		<LocationProvider>
-			<Layout> {/* Using the Layout component */}
+			<Layout searchTerm={searchTerm} onSearchChange={handleSearchChange}> 
 				<Router>
-					<Route path="/" component={Home} />
+					<Route path="/" component={() => <Home searchTerm={searchTerm} />} />
 					<Route default component={NotFound} />
 				</Router>
 			</Layout>

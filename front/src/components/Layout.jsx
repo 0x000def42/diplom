@@ -4,10 +4,10 @@ import Footer from './Footer';
 import { AppBar, Toolbar, Typography, Container, Grid, Card, CardContent, CardMedia, Button, TextField, Box } from '@mui/material';
 import "../style.css"
 
-const Layout = ({ children }) => {
+const Layout = ({ children, searchTerm, onSearchChange }) => {
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', backgroundColor: '#f8f9fa' }}>
-        <Header />
+        <Header searchTerm={searchTerm} onSearchChange={onSearchChange} />
         <main>{children}</main>
         <Footer />
     </Box>
