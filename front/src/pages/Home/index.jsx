@@ -1,20 +1,23 @@
-import React, { useEffect, useState } from 'react';
-import { AppBar, Toolbar, Typography, Container, Grid2, Card, CardContent, CardMedia, Button } from '@mui/material';
+import { useEffect, useState } from 'react';
+import {  Typography, Dialog, DialogContent, IconButton, Container, Grid2, Card, CardContent, CardMedia, Button } from '@mui/material';
 import { styled } from '@mui/system';
 import axios from 'axios';
 
 const CardImage = styled(CardMedia)({
-  height: 300,
-  objectFit: 'cover',
   cursor: 'pointer',
 });
 
-const MyCard = styled(Card)({
+const ImageContaner = styled(Container)({
+  objectFit: 'cover',
   cursor: 'pointer',
   padding: 15,
   '&:hover': {
     background: "#eee",
   },
+})
+
+const MyCard = styled(Card)({
+  //
 })
 
 const MainContainer = styled(Container)({
@@ -25,6 +28,9 @@ const MainContainer = styled(Container)({
 
 const Home = () => {
   const [templates, setTemplates] = useState([]);
+  const [open, setOpen] = useState(false);
+  const [selectedImage, setSelectedImage] = useState('');
+
 
   useEffect(() => {
     const fetchTemplates = async () => {
@@ -39,6 +45,15 @@ const Home = () => {
 
     fetchTemplates();
   }, []);
+
+  const handleOpen = (img) => {
+    setSelectedImage(img)
+    setOpen(true)
+  }
+
+  const handleClose = () => {
+    setOpen(false)
+  }
   
   return (
       <MainContainer>
@@ -46,7 +61,9 @@ const Home = () => {
           {templates.map((item, index) => (
             <Grid2 size={4}>
               <MyCard>
-                <CardImage component="img" image={item.preview_url} alt={item.name} />
+                <ImageContaner onClick={() => handleOpen(item.preview_url) }>
+                  <CardImage component="img" image={item.preview_url} alt={item.name} onClick={() => handleOpen(item.preview_url)} />
+                </ImageContaner>
                 <CardContent>
                   <Typography variant="h6">{item.name}</Typography>
                   <Typography variant="body2" color="text.secondary">
@@ -57,6 +74,16 @@ const Home = () => {
             </Grid2>
           ))}
         </Grid2>
+
+        <Dialog open={open} onClose={handleClose} maxWidth="xl" fullWidth>
+          <DialogContent sx={{ position: 'relative', p: 0, backgroundColor: '#000' }}>
+            <IconButton onClick={handleClose} sx={{ position: 'absolute', top: 8, right: 8, color: '#fff' }}>
+              x
+            </IconButton>
+            <img src={selectedImage} style={{ width: '100%', height: '100%', objectFit: 'contain' }}/>
+          </DialogContent>
+        </Dialog>
+
       </MainContainer>
   );
 }
