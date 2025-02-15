@@ -60,7 +60,7 @@ const Home = () => {
         <Grid2 container spacing={3}>
           {templates.map((item, index) => (
             <Grid2 size={4}>
-              <MyCard>
+              <MyCard sx={{  boxShadow: 3 }}>
                 <ImageContaner onClick={() => handleOpen(item.preview_url) }>
                   <CardImage component="img" image={item.preview_url} alt={item.name} onClick={() => handleOpen(item.preview_url)} />
                 </ImageContaner>
@@ -69,6 +69,9 @@ const Home = () => {
                   <Typography variant="body2" color="text.secondary">
                     {item.description}
                   </Typography>
+                  <Button download href={item.file_url} variant="contained" color="primary" sx={{ mt: 2 }}>
+                    Скачать
+                  </Button>
                 </CardContent>
               </MyCard>
             </Grid2>
