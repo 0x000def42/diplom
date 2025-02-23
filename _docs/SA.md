@@ -194,3 +194,18 @@ curl -X POST "https://api.example.com/reviews" \
 | `created_at` | `TEXT DEFAULT (datetime('now')` | Дата создания |
 
 ---
+
+Интеграция с МоиОтчеты Облако
+
+```plantuml
+@startuml
+
+participant "Каталог Отчетов" as catalog
+participant "МоиОтчеты Облако" as cloud
+
+catalog --> cloud: UPLOAD_REQUEST
+catalog --> cloud: EXPORT_REQUEST
+catalog --> cloud: STATUS_REQUEST
+catalog --> cloud: DOWNLOAD_REQUEST
+
+```
