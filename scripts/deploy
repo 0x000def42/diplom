@@ -1,0 +1,14 @@
+#!/bin/bash
+
+ssh root@37.252.21.85 << 'EOF'
+    cd ~/diplom
+    git pull origin main
+    npm install
+    npm run build
+    cd backend
+    source venv/bin/activate
+    pkill -f "python manage.py runserver" || true
+    pip install -r requirements.txt
+    python manage.py migrate
+    nohup python manage.py runserver 0.0.0.0:8000 > ~/diplom/backend/logs/server.log 2>&1 &
+EOF
