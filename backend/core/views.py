@@ -25,4 +25,8 @@ def create_review(request):
     return Response(serializer.errors, status=400)
 
 def home(request):
-    return HttpResponse("<h1>Welcome to the Homepage!</h1>")
+    """Раздаёт index.html при обращении в рут"""
+    index_path = os.path.join(settings.FRONTEND_DIR, "index.html")
+    if os.path.exists(index_path):
+        return FileResponse(open(index_path, "rb"))
+    raise Http404("index.html не найден")
