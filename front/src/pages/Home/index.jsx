@@ -122,16 +122,8 @@ const Home = ({searchTerm}) => {
                   <Typography variant="body2" color="text.secondary">
                     {item.description}
                   </Typography>
-                  <a href={item.file_url} download>
-                    <Button variant="contained" color="primary" sx={{ mt: 2 }}>
-                      Скачать1
-                    </Button>
-                  </a>
-                  <Button component="a" href={item.file_url} download rel="noopener noreferrer" variant="contained" color="primary" sx={{ mt: 2 }}>
-                    Скачать2
-                  </Button>
                   <Button component="a" href={item.file_url} download target="_blank" rel="noopener noreferrer" variant="contained" color="primary" sx={{ mt: 2 }}>
-                    Скачать3
+                    Скачать
                   </Button>
                 </CardContent>
               </MyCard>
