@@ -1,6 +1,7 @@
 import os
 from django.shortcuts import get_object_or_404
 from django.http import FileResponse, HttpResponse
+from django.conf import settings
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from .models import Template, Review
