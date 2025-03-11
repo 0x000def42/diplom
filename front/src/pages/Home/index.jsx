@@ -75,10 +75,14 @@ const Home = ({searchTerm}) => {
     try {
       // POST /reviews { email, title, body }
       const response = await axios.post('/api/reviews/', {
-        email: reviewEmail,
-        title: reviewTitle,
-        body: reviewBody
-      });
+          email: reviewEmail,
+          title: reviewTitle,
+          body: reviewBody
+        },
+        {
+          withCredentials: true
+        }
+      );
 
       setShowSuccessSnackbar(true);
 
