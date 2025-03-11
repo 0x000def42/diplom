@@ -42,7 +42,7 @@ const Home = ({searchTerm}) => {
     const fetchTemplates = async () => {
       try {
         // GET /templates {query}
-        const url = `http://localhost:8000/api/templates/?query=${encodeURIComponent(searchTerm)}`;
+        const url = `/api/templates/?query=${encodeURIComponent(searchTerm)}`;
         const response = await axios.get(url);
         console.log('Fetched templates:', response.data);
         setTemplates(response.data);

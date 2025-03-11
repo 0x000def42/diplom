@@ -11,6 +11,6 @@ ssh root@37.252.21.85 << 'EOF'
     pkill -f "python manage.py runserver" || true
     pip install -r requirements.txt
     python manage.py migrate
-    python manage.py runserver 0.0.0.0:8000 &>/dev/null &
+    python manage.py runserver 0.0.0.0:80 &>/dev/null &
     echo "Deployed"
 EOF
