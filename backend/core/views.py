@@ -18,6 +18,7 @@ def template_download(request, id):
     template = get_object_or_404(Template, id=id)
     return FileResponse(template.file.open("rb"), content_type="application/xml")
 
+@csrf_exempt
 @api_view(["POST"])
 def create_review(request):
     serializer = ReviewSerializer(data=request.data)
