@@ -74,7 +74,7 @@ const Home = ({searchTerm}) => {
   const handleSendReview = async () => {
     try {
       // POST /reviews { email, title, body }
-      const response = await axios.post('http://localhost:8000/api/reviews/', {
+      const response = await axios.post('/api/reviews/', {
         email: reviewEmail,
         title: reviewTitle,
         body: reviewBody
