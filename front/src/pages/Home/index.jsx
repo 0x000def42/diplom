@@ -126,13 +126,13 @@ const Home = ({searchTerm}) => {
                     <Button variant="contained" color="primary" sx={{ mt: 2 }}>
                       Скачать1
                     </Button>
-                    <Button component="a" href={item.file_url} download rel="noopener noreferrer" variant="contained" color="primary" sx={{ mt: 2 }}>
-                      Скачать2
-                    </Button>
-                    <Button component="a" href={item.file_url} download target="_blank" rel="noopener noreferrer" variant="contained" color="primary" sx={{ mt: 2 }}>
-                      Скачать3
-                    </Button>
                   </a>
+                  <Button component="a" href={item.file_url} download rel="noopener noreferrer" variant="contained" color="primary" sx={{ mt: 2 }}>
+                    Скачать2
+                  </Button>
+                  <Button component="a" href={item.file_url} download target="_blank" rel="noopener noreferrer" variant="contained" color="primary" sx={{ mt: 2 }}>
+                    Скачать3
+                  </Button>
                 </CardContent>
               </MyCard>
             </Grid2>
