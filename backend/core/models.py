@@ -35,6 +35,15 @@ class Review(models.Model):
     def __str__(self):
         return self.title
 
+class ExternalUser(models.Model):
+    external_id = models.CharField(max_length=255, unique=True)
+    provider = models.CharField(max_length=50)
+    email = models.EmailField()
+    name = models.CharField(max_length=255)
+
+    class Meta:
+        unique_together = ('external_id', 'provider')
+
 class Template(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField()

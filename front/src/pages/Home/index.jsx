@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import {  Typography, Dialog, DialogContent, IconButton, Container, Grid2, Card, CardContent, CardMedia, Button, DialogTitle, TextField, DialogActions, Snackbar, Alert } from '@mui/material';
 import { styled } from '@mui/system';
-import axios from 'axios';
+import api from "@/utils/api.js";
 
 const CardImage = styled(CardMedia)({
   cursor: 'pointer',
@@ -37,13 +37,12 @@ const Home = ({searchTerm}) => {
   const [reviewBody, setReviewBody] = useState('');
   const [showSuccessSnackbar, setShowSuccessSnackbar] = useState(false);
 
-
   useEffect(() => {
     const fetchTemplates = async () => {
       try {
         // GET /templates {query}
-        const url = `/api/templates/?query=${encodeURIComponent(searchTerm)}`;
-        const response = await axios.get(url);
+        const url = `/templates/?query=${encodeURIComponent(searchTerm)}`;
+        const response = await api.get(url);
         console.log('Fetched templates:', response.data);
         setTemplates(response.data);
       } catch (error) {
@@ -74,7 +73,7 @@ const Home = ({searchTerm}) => {
   const handleSendReview = async () => {
     try {
       // POST /reviews { email, title, body }
-      const response = await axios.post('/api/reviews/', {
+      const response = await api.post('/reviews/', {
           email: reviewEmail,
           title: reviewTitle,
           body: reviewBody
@@ -117,7 +116,7 @@ const Home = ({searchTerm}) => {
         <Grid2 container spacing={3}>
           {templates.map((item, index) => (
             <Grid2 size={4}>
-              <MyCard sx={{  boxShadow: 3 }}>
+              <MyCard sx={{ boxShadow: 3 }}>
                 <ImageContaner onClick={() => handleOpen(item.preview_url) }>
                   <CardImage component="img" image={item.preview_url} alt={item.name} onClick={() => handleOpen(item.preview_url)} />
                 </ImageContaner>
@@ -152,20 +151,20 @@ const Home = ({searchTerm}) => {
             required
             label="Ваш email"
             value={reviewEmail}
-            onChange={(e) => setReviewEmail(e.target.value)}
+            onChange={(e) => setReviewEmail(e.currentTarget.value)}
             type="email"
           />
           <TextField
             required
             label="Заголовок"
             value={reviewTitle}
-            onChange={(e) => setReviewTitle(e.target.value)}
+            onChange={(e) => setReviewTitle(e.currentTarget.value)}
           />
           <TextField
             required
             label="Описание (текст обращения)"
             value={reviewBody}
-            onChange={(e) => setReviewBody(e.target.value)}
+            onChange={(e) => setReviewBody(e.currentTarget.value)}
             multiline
             minRows={3}
           />

@@ -3,3 +3,4 @@ djangorestframework==3.15.2
 django-extensions
 django-cors-headers
 requests
+google-auth
