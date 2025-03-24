@@ -5,12 +5,33 @@ from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
+from rest_framework.views import APIView
 from .models import Template, Review, ExternalUser
 from .serializers import TemplateSerializer, ReviewSerializer
 from google.oauth2 import id_token
 from google.auth.transport import requests as google_requests
 
 GOOGLE_CLIENT_ID = "53718529070-ni24nagt6ja2vkn7ka5dtdla9o0aj5dv.apps.googleusercontent.com"
+
+
+def get_user_from_token(request):
+    auth_header = request.headers.get("Authorization")
+    if not auth_header or not auth_header.startswith("Bearer "):
+        return None, Response({"error": "Missing or invalid Authorization header"}, status=status.HTTP_401_UNAUTHORIZED)
+
+    token = auth_header.split(" ")[1]
+
+    try:
+        idinfo = id_token.verify_oauth2_token(token, google_requests.Request(), GOOGLE_CLIENT_ID)
+    except ValueError as e:
+        return None, Response({"error": f"Invalid token: {str(e)}"}, status=status.HTTP_401_UNAUTHORIZED)
+
+    try:
+        user = ExternalUser.objects.get(external_id=idinfo["sub"], provider="google")
+    except ExternalUser.DoesNotExist:
+        return None, Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    return user, None
 
 @api_view(["GET"])
 def template_list(request):
@@ -61,3 +82,33 @@ def google_auth(request):
     )
 
     return Response({"status": "ok", "user_id": user.id})
+
+class UserMeView(APIView):
+    def get(self, request):
+        user, error = get_user_from_token(request)
+        if error:
+            return error
+
+        return Response({
+            "id": user.id,
+            "email": user.email,
+            "name": user.name,
+        })
+
+    def put(self, request):
+        user, error = get_user_from_token(request)
+        if error:
+            return error
+
+        name = request.data.get("name", "").strip()
+        if not name:
+            return Response({"error": "Name is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        user.name = name
+        user.save()
+
+        return Response({
+            "id": user.id,
+            "email": user.email,
+            "name": user.name,
+        })
