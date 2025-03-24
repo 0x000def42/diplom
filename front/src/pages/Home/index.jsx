@@ -101,11 +101,11 @@ const Home = ({searchTerm}) => {
   return (
       <MainContainer>
         {templates.length === 0 ? (
-          <Container sx={{ textAlign: 'center', mt: 4, color: 'black' }}>
+          <Container sx={{ textAlign: 'center', mt: 4, }}>
             <Typography variant="h6" gutterBottom>
               Ничего не найдено
             </Typography>
-            <Typography variant="body1" sx={{ color: 'black' }}>
+            <Typography variant="body1" sx={{ }}>
               Вы можете оставить обращение c просьбой добавить нужный шаблон
             </Typography>
             <Button variant="contained" sx={{ mt: 2 }} onClick={openReviewDialog}>
@@ -135,8 +135,8 @@ const Home = ({searchTerm}) => {
         </Grid2>
         )}
         <Dialog open={open} onClose={handleClose} maxWidth="xl" fullWidth>
-          <DialogContent sx={{ position: 'relative', p: 0, backgroundColor: '#000' }}>
-            <IconButton onClick={handleClose} sx={{ position: 'absolute', top: 8, right: 8, color: '#fff' }}>
+          <DialogContent sx={{ position: 'relative', p: 0,  }}>
+            <IconButton onClick={handleClose} sx={{ position: 'absolute', top: 8, right: 8,}}>
               x
             </IconButton>
             <img src={selectedImage} style={{ width: '100%', height: '100%', objectFit: 'contain' }}/>
@@ -192,11 +192,11 @@ const Home = ({searchTerm}) => {
       {/* Диалог для просмотра картинки (у вас уже был) */}
       <Dialog open={open} onClose={handleClose} maxWidth="xl" fullWidth>
         <DialogContent
-          sx={{ position: 'relative', p: 0, backgroundColor: '#000' }}
+          sx={{ position: 'relative', p: 0,  }}
         >
           <IconButton
             onClick={handleClose}
-            sx={{ position: 'absolute', top: 8, right: 8, color: '#fff' }}
+            sx={{ position: 'absolute', top: 8, right: 8,  }}
           >
             x
           </IconButton>

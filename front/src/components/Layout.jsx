@@ -6,7 +6,7 @@ import "../style.css"
 
 const Layout = ({ children, searchTerm, user, onLogin, onSearchChange }) => {
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', backgroundColor: '#f8f9fa' }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
         <Header searchTerm={searchTerm} user={user} onLogin={onLogin} onSearchChange={onSearchChange} />
         <main>{children}</main>
         <Footer />

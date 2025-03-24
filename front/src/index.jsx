@@ -6,6 +6,8 @@ import { useState, useEffect } from 'preact/hooks';
 
 import Layout from './components/Layout.jsx';
 import Home from './pages/Home/index.jsx';
+import Profile from './pages/Profile/index.jsx';
+
 import { NotFound } from './pages/_404.jsx';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { jwtDecode } from 'jwt-decode';
@@ -48,6 +50,7 @@ export function App() {
 			<Layout searchTerm={searchTerm} user={user} onLogin={setUser} onSearchChange={handleSearchChange}> 
 				<Router>
 					<Route path="/" component={() => <Home searchTerm={searchTerm} />} />
+					<Route path="/profile" component={() => <Profile/>} />
 					<Route default component={NotFound} />
 				</Router>
 			</Layout>
