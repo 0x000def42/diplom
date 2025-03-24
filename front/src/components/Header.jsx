@@ -1,23 +1,43 @@
-import { AppBar, Toolbar, Typography, TextField } from '@mui/material';
+import { AppBar, Toolbar, Typography, TextField, Tooltip, IconButton } from '@mui/material';
 import { useLocation } from 'preact-iso';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import LoginButton from './LoginButton';
 
-export function Header({ searchTerm, onSearchChange }) {
+export function Header({ searchTerm, user, onLogin, onSearchChange }) {
 	const { url } = useLocation();
 
 	return (
 		<AppBar position="static" sx={{ backgroundColor: '#1976d2', mb: 4 }}>
 			<Toolbar>
-			<Typography variant="h6" sx={{ flexGrow: 1 }}>
-				Каталог шаблонов
-			</Typography>
-			<TextField
-				variant="outlined"
-				size="small"
-				value={searchTerm}
-				onChange={onSearchChange}
-				placeholder="Поиск шаблонов..."
-				sx={{ backgroundColor: 'white', borderRadius: 1, width: '250px' }}
-			/>
+				<Typography variant="h6" sx={{ flexGrow: 1 }}>
+					Каталог шаблонов
+				</Typography>
+				{user ? (
+					<Tooltip title="Профиль">
+						<IconButton
+							href="/profile"
+							sx={{
+								color: 'white',
+								'&:hover': {
+									color: '#bbdefb',
+								},
+								ml: 1,
+							}}
+						>
+							<AccountCircleIcon />
+						</IconButton>
+				</Tooltip>
+				) : (
+					<LoginButton onLogin={onLogin} />
+				)}
+				<TextField
+					variant="outlined"
+					size="small"
+					value={searchTerm}
+					onChange={onSearchChange}
+					placeholder="Поиск шаблонов..."
+					sx={{ backgroundColor: 'white', borderRadius: 1, width: '250px', ml: 3 }}
+				/>
 			</Toolbar>
       </AppBar>
 
