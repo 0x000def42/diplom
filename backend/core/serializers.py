@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from .models import Template, Review
 
-class TemplateSerializer(serializers.ModelSerializer):
+class TemplateListSerializer(serializers.ModelSerializer):
     file_url = serializers.SerializerMethodField()
     preview_url = serializers.SerializerMethodField()
 
@@ -14,6 +14,18 @@ class TemplateSerializer(serializers.ModelSerializer):
 
     def get_preview_url(self, obj):
         return f"{obj.preview_file.url}" if obj.preview_file else None
+        
+class TemplateSerializer(TemplateListSerializer):
+    liked = serializers.SerializerMethodField()
+
+    class Meta(TemplateListSerializer.Meta):
+        fields = TemplateListSerializer.Meta.fields + ["liked"]
+
+    def get_liked(self, obj):
+        user = self.context.get("user")
+        if not user:
+            return False
+        return obj.liked_by.filter(id=user.id).exists()
 
 class ReviewSerializer(serializers.ModelSerializer):
     class Meta:

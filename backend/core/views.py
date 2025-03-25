@@ -7,9 +7,10 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework.views import APIView
 from .models import Template, Review, ExternalUser
-from .serializers import TemplateSerializer, ReviewSerializer
+from .serializers import TemplateListSerializer, TemplateSerializer, ReviewSerializer
 from google.oauth2 import id_token
 from google.auth.transport import requests as google_requests
+from rest_framework import status
 
 GOOGLE_CLIENT_ID = "53718529070-ni24nagt6ja2vkn7ka5dtdla9o0aj5dv.apps.googleusercontent.com"
 
@@ -36,13 +37,52 @@ def get_user_from_token(request):
 @api_view(["GET"])
 def template_list(request):
     query = request.GET.get("query", "")
-    templates = Template.objects.filter(name__icontains=query)
-    return Response(TemplateSerializer(templates, many=True).data)
+    favorites_only = request.GET.get("favoritesOnly") == "true"
+
+    user, _ = get_user_from_token(request)
+
+    qs = Template.objects.filter(name__icontains=query)
+
+    if favorites_only and user:
+        qs = qs.filter(liked_by=user)
+
+    return Response(TemplateListSerializer(qs, many=True).data)
+
+@api_view(["GET"])
+def template_list_meta(request):
+    user, error = get_user_from_token(request)  
+    if error:
+        return Response({"favorites": 0})
+
+    return Response({"favorites": user.likes.count()})
+
+@api_view(["GET"])
+def template_get(request, id):
+    template = get_object_or_404(Template, id=id)
+    user, error = get_user_from_token(request)
+    return Response(TemplateSerializer(template, context={"user": user}).data)
 
 @api_view(["GET"])
 def template_download(request, id):
     template = get_object_or_404(Template, id=id)
     return FileResponse(template.file.open("rb"), content_type="application/xml")
+
+@api_view(["POST"])
+def toggle_like(request, id):
+    user, error = get_user_from_token(request)
+    if error:
+        return error
+
+    template = get_object_or_404(Template, id=id)
+
+    if template.liked_by.filter(id=user.id).exists():
+        template.liked_by.remove(user)
+        liked = False
+    else:
+        template.liked_by.add(user)
+        liked = True
+
+    return Response({"liked": liked})
 
 @csrf_exempt
 @api_view(["POST"])
@@ -51,7 +91,7 @@ def create_review(request):
     if serializer.is_valid():
         review = serializer.save()
         return Response({"id": review.id})
-    return Response(serializer.errors, status=400)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 def home(request):
     """Раздаёт index.html при обращении в рут"""
