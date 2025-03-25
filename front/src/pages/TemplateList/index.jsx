@@ -1,213 +1,121 @@
 import { useEffect, useState } from 'react';
-import {  Typography, Dialog, DialogContent, IconButton, Container, Grid2, Card, CardContent, CardMedia, Button, DialogTitle, TextField, DialogActions, Snackbar, Alert } from '@mui/material';
+import {
+  Typography, Dialog, DialogContent, Container, Grid2, Button,
+  DialogTitle, TextField, DialogActions, Snackbar, Alert,
+  Checkbox, FormControlLabel
+} from '@mui/material';
 import { styled } from '@mui/system';
-import api from "@/utils/api.js";
-import { useLocation } from 'preact-iso';
-
-
-const ImageContaner = styled(Container)({
-  objectFit: 'cover',
-  cursor: 'pointer',
-  padding: 15,
-  '&:hover': {
-    background: "#eee",
-  },
-})
-
-const MyCard = styled(Card)({
-  //
-})
+import api from '@/utils/api.js';
+import TemplateGrid from './TemplateGrid';
+import { useGlobalStore } from '@/store';
 
 const MainContainer = styled(Container)({
   display: 'flex',
   flexDirection: 'column',
 });
 
-
-const TemplateList = ({searchTerm}) => {
-  const [templates, setTemplates] = useState([]);
-  const [open, setOpen] = useState(false);
-  const [selectedImage, setSelectedImage] = useState('');
-  const {route} = useLocation()
-
+const TemplateList = () => {
+  const [templates, setTemplates] = useState(null);
+  const [meta, setMeta] = useState(null);
   const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
   const [reviewEmail, setReviewEmail] = useState('');
   const [reviewTitle, setReviewTitle] = useState('');
   const [reviewBody, setReviewBody] = useState('');
   const [showSuccessSnackbar, setShowSuccessSnackbar] = useState(false);
 
+  const searchTerm = useGlobalStore((s) => s.searchTerm);
+  const user = useGlobalStore((s) => s.user)
+  const showOnlyFavorites = useGlobalStore((s) => s.showOnlyFavorites);
+  const toggleFavoritesFilter = useGlobalStore((s) => s.toggleFavoritesFilter);
+
   useEffect(() => {
     const fetchTemplates = async () => {
-      try {
-        // GET /templates {query}
-        const url = `/templates/?query=${encodeURIComponent(searchTerm)}`;
-        const response = await api.get(url);
-        console.log('Fetched templates:', response.data);
-        setTemplates(response.data);
-      } catch (error) {
-        console.error('Error fetching templates:', error);
+      const params = new URLSearchParams();
+      params.set("query", searchTerm);
+      if (showOnlyFavorites) {
+        params.set("favoritesOnly", "true");
       }
+
+      const url = `/templates/?${params.toString()}`;
+      const response = await api.get(url);
+      setTemplates(response.data);
     };
-
     fetchTemplates();
-  }, []);
+  }, [searchTerm, showOnlyFavorites]);
 
-  const handleOpen = (img) => {
-    setSelectedImage(img)
-    setOpen(true)
-  }
+  useEffect(() => {
+    const fetchTemplatesMeta = async () => {
+      const url = `/templates/meta`
+      const response = await api.get(url)
 
-  const handleClose = () => {
-    setOpen(false)
-  }
-
-  const openReviewDialog = () => {
-    setReviewDialogOpen(true);
-  };
-
-  const closeReviewDialog = () => {
-    setReviewDialogOpen(false);
-  };
-
-  const handleSendReview = async () => {
-    try {
-      // POST /reviews { email, title, body }
-      const response = await api.post('/reviews/', {
-          email: reviewEmail,
-          title: reviewTitle,
-          body: reviewBody
-        },
-        {
-          withCredentials: true
-        }
-      );
-
-      setShowSuccessSnackbar(true);
-
-      closeReviewDialog();
-      setReviewEmail('');
-      setReviewTitle('');
-      setReviewBody('');
-    } catch (error) {
-      console.error('Error sending review:', error);
+      setMeta(response.data)
     }
-  };
+    fetchTemplatesMeta()
+  }, [user])
 
-  const handleCloseSnackbar = () => {
-    setShowSuccessSnackbar(false);
-  };
-  
+  if(templates == null || meta == null) return
+
   return (
-      <MainContainer>
-        {templates.length === 0 ? (
-          <Container sx={{ textAlign: 'center', mt: 4, }}>
-            <Typography variant="h6" gutterBottom>
-              Ничего не найдено
-            </Typography>
-            <Typography variant="body1" sx={{ }}>
-              Вы можете оставить обращение c просьбой добавить нужный шаблон
-            </Typography>
-            <Button variant="contained" sx={{ mt: 2 }} onClick={openReviewDialog}>
-              Оставить обращение
-            </Button>
-          </Container>
-        ) : (
-        <Grid2 container spacing={3}>
-          {templates.map((item, index) => (
-            <Grid2 size={4}>
-              <MyCard sx={{ boxShadow: 3 }}>
-                <ImageContaner onClick={ () => route(`/templates/${item.id}`) } >
-                  <CardMedia component="img" image={item.preview_url} alt={item.name} />
-                </ImageContaner>
-                <CardContent>
-                  <Typography variant="h6">{item.name}</Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {item.description}
-                  </Typography>
-                  <Button component="a" href={item.file_url} download target="_blank" rel="noopener noreferrer" variant="contained" color="primary" sx={{ mt: 2 }}>
-                    Скачать
-                  </Button>
-                </CardContent>
-              </MyCard>
-            </Grid2>
-          ))}
-        </Grid2>
-        )}
-        <Dialog open={open} onClose={handleClose} maxWidth="xl" fullWidth>
-          <DialogContent sx={{ position: 'relative', p: 0,  }}>
-            <IconButton onClick={handleClose} sx={{ position: 'absolute', top: 8, right: 8,}}>
-              x
-            </IconButton>
-            <img src={selectedImage} style={{ width: '100%', height: '100%', objectFit: 'contain' }}/>
-          </DialogContent>
-        </Dialog>
+    <MainContainer>
+      <Grid2 size={4}>
+        <FormControlLabel
+          control={<Checkbox checked={showOnlyFavorites} onChange={toggleFavoritesFilter} />}
+          label={`Только избранное (${meta.favorites})`}
+        />
+      </Grid2>
 
-        {/* Диалог для отправки отзыва */}
-      <Dialog open={reviewDialogOpen} onClose={closeReviewDialog} maxWidth="sm" fullWidth>
+      {templates.length === 0 ? (
+        <Container sx={{ textAlign: 'center', mt: 4 }}>
+          <Typography variant="h6" gutterBottom>Ничего не найдено</Typography>
+          <Typography variant="body1">Вы можете оставить обращение c просьбой добавить нужный шаблон</Typography>
+          <Button variant="contained" sx={{ mt: 2 }} onClick={() => setReviewDialogOpen(true)}>
+            Оставить обращение
+          </Button>
+        </Container>
+      ) : (
+        <Grid2 container spacing={3}>
+          <TemplateGrid templates={templates} />
+        </Grid2>
+      )}
+
+      <Dialog open={reviewDialogOpen} onClose={() => setReviewDialogOpen(false)} maxWidth="sm" fullWidth>
         <DialogTitle>Оставить обращение</DialogTitle>
         <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-          <TextField
-            required
-            label="Ваш email"
-            value={reviewEmail}
-            onChange={(e) => setReviewEmail(e.currentTarget.value)}
-            type="email"
-          />
-          <TextField
-            required
-            label="Заголовок"
-            value={reviewTitle}
-            onChange={(e) => setReviewTitle(e.currentTarget.value)}
-          />
-          <TextField
-            required
-            label="Описание (текст обращения)"
-            value={reviewBody}
-            onChange={(e) => setReviewBody(e.currentTarget.value)}
-            multiline
-            minRows={3}
-          />
+          <TextField required label="Ваш email" value={reviewEmail} onChange={(e) => setReviewEmail(e.currentTarget.value)} type="email" />
+          <TextField required label="Заголовок" value={reviewTitle} onChange={(e) => setReviewTitle(e.currentTarget.value)} />
+          <TextField required label="Описание (текст обращения)" value={reviewBody} onChange={(e) => setReviewBody(e.currentTarget.value)} multiline minRows={3} />
         </DialogContent>
         <DialogActions>
-          <Button onClick={closeReviewDialog}>Отмена</Button>
-          <Button variant="contained" onClick={handleSendReview}>
+          <Button onClick={() => setReviewDialogOpen(false)}>Отмена</Button>
+          <Button variant="contained" onClick={async () => {
+            try {
+              await api.post('/reviews/', { email: reviewEmail, title: reviewTitle, body: reviewBody });
+              setShowSuccessSnackbar(true);
+              setReviewDialogOpen(false);
+              setReviewEmail('');
+              setReviewTitle('');
+              setReviewBody('');
+            } catch (err) {
+              console.error('Error sending review:', err);
+            }
+          }}>
             Отправить
           </Button>
         </DialogActions>
       </Dialog>
 
-      {/* Снекбар "Спасибо, ваш отзыв успешно отправлен" */}
       <Snackbar
         open={showSuccessSnackbar}
         autoHideDuration={3000}
-        onClose={handleCloseSnackbar}
+        onClose={() => setShowSuccessSnackbar(false)}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       >
-        <Alert onClose={handleCloseSnackbar} severity="success" sx={{ width: '100%' }}>
+        <Alert onClose={() => setShowSuccessSnackbar(false)} severity="success" sx={{ width: '100%' }}>
           Спасибо, ваш отзыв успешно отправлен!
         </Alert>
       </Snackbar>
-
-      {/* Диалог для просмотра картинки (у вас уже был) */}
-      <Dialog open={open} onClose={handleClose} maxWidth="xl" fullWidth>
-        <DialogContent
-          sx={{ position: 'relative', p: 0,  }}
-        >
-          <IconButton
-            onClick={handleClose}
-            sx={{ position: 'absolute', top: 8, right: 8,  }}
-          >
-            x
-          </IconButton>
-          <img
-            src={selectedImage}
-            style={{ width: '100%', height: '100%', objectFit: 'contain' }}
-          />
-        </DialogContent>
-      </Dialog>
-
-      </MainContainer>
+    </MainContainer>
   );
-}
+};
 
 export default TemplateList;

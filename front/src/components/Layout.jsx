@@ -5,7 +5,7 @@ import { AppBar, Toolbar, Typography, Container, Grid, Card, CardContent, CardMe
 import "../style.css"
 import api from '@/utils/api';
 
-const Layout = ({ children, searchTerm, user, onLogin, onSearchChange }) => {
+const Layout = ({ children }) => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMsg, setSnackbarMsg] = useState('');
 
@@ -26,7 +26,7 @@ const Layout = ({ children, searchTerm, user, onLogin, onSearchChange }) => {
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-        <Header searchTerm={searchTerm} user={user} onLogin={onLogin} onSearchChange={onSearchChange} />
+        <Header />
         <main>{children}</main>
         <Footer />
 

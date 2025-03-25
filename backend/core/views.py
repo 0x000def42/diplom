@@ -37,8 +37,24 @@ def get_user_from_token(request):
 @api_view(["GET"])
 def template_list(request):
     query = request.GET.get("query", "")
-    templates = Template.objects.filter(name__icontains=query)
-    return Response(TemplateListSerializer(templates, many=True).data)
+    favorites_only = request.GET.get("favoritesOnly") == "true"
+
+    user, _ = get_user_from_token(request)
+
+    qs = Template.objects.filter(name__icontains=query)
+
+    if favorites_only and user:
+        qs = qs.filter(liked_by=user)
+
+    return Response(TemplateListSerializer(qs, many=True).data)
+
+@api_view(["GET"])
+def template_list_meta(request):
+    user, error = get_user_from_token(request)  
+    if error:
+        return Response({"favorites": 0})
+
+    return Response({"favorites": user.likes.count()})
 
 @api_view(["GET"])
 def template_get(request, id):

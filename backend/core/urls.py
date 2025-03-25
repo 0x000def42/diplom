@@ -3,6 +3,7 @@ from . import views as v
 
 urlpatterns = [
     path("templates/", v.template_list, name="template_list"),
+    path("templates/meta", v.template_list_meta),
     path("templates/<int:id>", v.template_get),
     path("templates/<int:id>/download/", v.template_download, name="template_download"),
     path("templates/<int:id>/like", v.toggle_like),

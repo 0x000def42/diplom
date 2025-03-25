@@ -41,6 +41,8 @@ class ExternalUser(models.Model):
     email = models.EmailField()
     name = models.CharField(max_length=255)
 
+    likes = models.ManyToManyField('Template', related_name='liked_by', blank=True)
+
     class Meta:
         unique_together = ('external_id', 'provider')
 
@@ -52,7 +54,6 @@ class Template(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    liked_by = models.ManyToManyField(ExternalUser, related_name='liked_templates', blank=True)
 
     def upload_to_fr_cloud(self):
         """Загружает файл в FastReport Cloud и возвращает remote_id"""
