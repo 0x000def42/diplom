@@ -26,7 +26,7 @@ const MainContainer = styled(Container)({
 });
 
 
-const Home = ({searchTerm}) => {
+const TemplateList = ({searchTerm}) => {
   const [templates, setTemplates] = useState([]);
   const [open, setOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState('');
@@ -211,4 +211,4 @@ const Home = ({searchTerm}) => {
   );
 }
 
-export default Home;
+export default TemplateList;
