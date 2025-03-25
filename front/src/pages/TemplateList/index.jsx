@@ -2,10 +2,8 @@ import { useEffect, useState } from 'react';
 import {  Typography, Dialog, DialogContent, IconButton, Container, Grid2, Card, CardContent, CardMedia, Button, DialogTitle, TextField, DialogActions, Snackbar, Alert } from '@mui/material';
 import { styled } from '@mui/system';
 import api from "@/utils/api.js";
+import { useLocation } from 'preact-iso';
 
-const CardImage = styled(CardMedia)({
-  cursor: 'pointer',
-});
 
 const ImageContaner = styled(Container)({
   objectFit: 'cover',
@@ -30,6 +28,7 @@ const TemplateList = ({searchTerm}) => {
   const [templates, setTemplates] = useState([]);
   const [open, setOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState('');
+  const {route} = useLocation()
 
   const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
   const [reviewEmail, setReviewEmail] = useState('');
@@ -117,8 +116,8 @@ const TemplateList = ({searchTerm}) => {
           {templates.map((item, index) => (
             <Grid2 size={4}>
               <MyCard sx={{ boxShadow: 3 }}>
-                <ImageContaner onClick={() => handleOpen(item.preview_url) }>
-                  <CardImage component="img" image={item.preview_url} alt={item.name} onClick={() => handleOpen(item.preview_url)} />
+                <ImageContaner onClick={ () => route(`/templates/${item.id}`) } >
+                  <CardMedia component="img" image={item.preview_url} alt={item.name} />
                 </ImageContaner>
                 <CardContent>
                   <Typography variant="h6">{item.name}</Typography>

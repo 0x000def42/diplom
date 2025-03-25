@@ -26,11 +26,7 @@ const Profile = () => {
       }
 
       try {
-        const response = await api.get('/users/me', {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
+        const response = await api.get('/users/me');
 
         setUser(response.data);
         setEditedName(response.data.name || '');

@@ -4,12 +4,16 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import LoginButton from './LoginButton';
 
 export function Header({ searchTerm, user, onLogin, onSearchChange }) {
-	const { url } = useLocation();
+	const { route } = useLocation();
 
 	return (
 		<AppBar position="static" sx={{  mb: 4 }}>
 			<Toolbar>
-				<Typography variant="h6" sx={{ flexGrow: 1 }}>
+				<Typography
+					variant="h6" 
+					sx={{ flexGrow: 1, cursor: 'pointer' }}
+					onClick={() => route('/')}
+				>
 					Каталог шаблонов
 				</Typography>
 				{user ? (

@@ -52,6 +52,8 @@ class Template(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    liked_by = models.ManyToManyField(ExternalUser, related_name='liked_templates', blank=True)
+
     def upload_to_fr_cloud(self):
         """Загружает файл в FastReport Cloud и возвращает remote_id"""
         with self.file.open("rb") as f:

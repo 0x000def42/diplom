@@ -1,12 +1,12 @@
 import { render } from 'preact';
-import { LocationProvider } from 'preact-iso';
-import { Router, Route } from 'preact-router';
+import { LocationProvider, Router, Route } from 'preact-iso';
 
 import { useState, useEffect } from 'preact/hooks';
 
 import Layout from './components/Layout.jsx';
 import TemplateList from './pages/TemplateList/index.jsx';
 import Profile from './pages/Profile/index.jsx';
+import Template from './pages/Template/index.jsx'
 
 import { NotFound } from './pages/_404.jsx';
 import { GoogleOAuthProvider } from '@react-oauth/google';
@@ -50,6 +50,7 @@ export function App() {
 			<Layout searchTerm={searchTerm} user={user} onLogin={setUser} onSearchChange={handleSearchChange}> 
 				<Router>
 					<Route path="/" component={() => <TemplateList searchTerm={searchTerm} />} />
+					<Route path="/templates/:id" component={() => <Template/>} />
 					<Route path="/profile" component={() => <Profile/>} />
 					<Route default component={NotFound} />
 				</Router>
