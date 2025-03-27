@@ -9,6 +9,7 @@ import { NotFound } from './pages/_404.jsx';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { jwtDecode } from 'jwt-decode';
 import { useGlobalStore } from './store';
+import TemplateUpload from './pages/TemplateUpload/index.jsx';
 
 export function App() {
   const setUser = useGlobalStore((s) => s.setUser);
@@ -46,6 +47,7 @@ export function App() {
       <Layout>
         <Router>
           <Route path="/" component={() => <TemplateList />} />
+          <Route path="/templates/upload" component={() => <TemplateUpload />}></Route>
           <Route path="/templates/:id" component={() => <Template />} />
           <Route path="/profile" component={() => <Profile />} />
           <Route default component={NotFound} />

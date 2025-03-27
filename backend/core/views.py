@@ -6,11 +6,19 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework.views import APIView
-from .models import Template, Review, ExternalUser
+from .models import Template, Review, ExternalUser, TemplateVersion
 from .serializers import TemplateListSerializer, TemplateSerializer, ReviewSerializer
 from google.oauth2 import id_token
 from google.auth.transport import requests as google_requests
 from rest_framework import status
+from django.core.files.base import ContentFile
+
+from .utils.fr_cloud import (
+    upload_to_fr_cloud,
+    export_to_image,
+    wait_for_export,
+    download_export,
+)
 
 GOOGLE_CLIENT_ID = "53718529070-ni24nagt6ja2vkn7ka5dtdla9o0aj5dv.apps.googleusercontent.com"
 
@@ -34,19 +42,38 @@ def get_user_from_token(request):
 
     return user, None
 
-@api_view(["GET"])
-def template_list(request):
-    query = request.GET.get("query", "")
-    favorites_only = request.GET.get("favoritesOnly") == "true"
+class TemplatesView(APIView):
+    def get(self, request):
+        query = request.GET.get("query", "")
+        favorites_only = request.GET.get("favoritesOnly") == "true"
 
-    user, _ = get_user_from_token(request)
+        user, _ = get_user_from_token(request)
 
-    qs = Template.objects.filter(name__icontains=query)
+        qs = Template.objects.filter(name__icontains=query)
 
-    if favorites_only and user:
-        qs = qs.filter(liked_by=user)
+        if favorites_only and user:
+            qs = qs.filter(liked_by=user)
 
-    return Response(TemplateListSerializer(qs, many=True).data)
+        return Response(TemplateListSerializer(qs, many=True).data)
+    
+    def post(self, request):
+        user, error = get_user_from_token(request)
+        if error:
+            return error
+        data = request.data
+        print(data)
+        template_version = get_object_or_404(TemplateVersion, id=data['versionId'])
+        template = Template.objects.create(
+            file=template_version.file,
+            preview_file=template_version.preview_file,
+            name=data['name'],
+            description=data['description'],
+            user_id=user.id
+        )
+        template_version.template = template
+        template_version.save()
+        return Response(TemplateSerializer(template, context={"user": user}).data)
+        
 
 @api_view(["GET"])
 def template_list_meta(request):
@@ -83,6 +110,46 @@ def toggle_like(request, id):
         liked = True
 
     return Response({"liked": liked})
+
+@csrf_exempt
+@api_view(["POST"])
+def template_versions_create(request):
+    user, error = get_user_from_token(request)
+    if error:
+        return error
+    uploaded_file = request.FILES.get('file')
+    if not uploaded_file:
+        return Response(
+            {"detail": "Не передан файл (ожидается ключ 'file')"},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    version = TemplateVersion.objects.create(
+        file=uploaded_file
+    )
+    return Response({"id": version.id})
+
+@csrf_exempt
+@api_view(["POST"])
+def template_versions_build(request, id):
+    _, error = get_user_from_token(request)
+    if error:
+        return error
+    
+    template_version = get_object_or_404(TemplateVersion, id=id)
+    try:
+        remote_id = upload_to_fr_cloud(template_version.file, f"template_{template_version.id}")
+        export_id = export_to_image(remote_id)
+        export_id = wait_for_export(export_id)
+        image_content = download_export(export_id)
+        preview_name = f"preview_{template_version.id}.png"
+        template_version.preview_file.save(preview_name, ContentFile(image_content))
+        template_version.save()
+        return Response({
+            "id": template_version.id,
+            "preview_url": template_version.preview_file.url
+        })
+    except Exception as e:
+        return Response({"detail": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @csrf_exempt
 @api_view(["POST"])

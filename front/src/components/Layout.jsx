@@ -4,6 +4,7 @@ import Footer from './Footer';
 import { AppBar, Toolbar, Typography, Container, Grid, Card, CardContent, CardMedia, Button, TextField, Box, Alert, Snackbar } from '@mui/material';
 import "../style.css"
 import api from '@/utils/api';
+import guard from '@/utils/guard'
 
 const Layout = ({ children }) => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
@@ -12,10 +13,12 @@ const Layout = ({ children }) => {
   useEffect(() => {
     // @ts-ignore
     api.onUnauthorized(() => showSnackbar("Сначала авторизуйтесь"))
+    guard.onUnauthorized(() => showSnackbar("Сначала авторизуйтесь"))
 
     return () => {
       // @ts-ignore
       api.onUnauthorized(() => {});
+      guard.onUnauthorized(() => {})
     }
   }, [])
   
