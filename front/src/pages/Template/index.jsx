@@ -1,10 +1,12 @@
 import api from '@/utils/api';
-import { Container, CircularProgress, Grid2, Typography, DialogContent, Dialog, IconButton, CardMedia, Box, Card, Chip, Divider, Stack, Tooltip, TextField, Button, Table, TableCell, TableContainer, TableHead, TableRow, TableBody } from '@mui/material';
+import { Container, CircularProgress, Grid2, Typography, DialogContent, Dialog, IconButton, CardMedia, Box, Card, Divider, Stack, Tooltip, TextField, Button, Table, TableCell, TableContainer, TableHead, TableRow, TableBody } from '@mui/material';
 import { useRoute } from 'preact-iso/router';
-import { Description, Edit as EditIcon, Logout as LogoutIcon, Save as SaveIcon } from '@mui/icons-material';
+import { Edit as EditIcon, Logout as LogoutIcon, Save as SaveIcon } from '@mui/icons-material';
 import { useEffect, useState } from 'preact/hooks';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import DownloadIcon from '@mui/icons-material/Download';
+import { useRef } from 'preact/hooks';
+import guard from '@/utils/guard';
 
 const Template = () => {
     const { params: {id} } = useRoute();
@@ -16,6 +18,8 @@ const Template = () => {
     const [editedName, setEditedName] = useState(null)
     const [editedDescription, setEditedDescription] = useState(null)
     const [editing, setEditing] = useState(false)
+
+    const fileInputRef = useRef(null)
 
     const fetchTemplate = async () => {
         try {
@@ -67,6 +71,26 @@ const Template = () => {
             fetchTemplate()
         } catch(err) {
             console.error("Не удалось сохранить шаблон", err)
+        }
+    }
+
+    const handleUpload = async (e) => {
+        const file = e.target.files[0]
+        if (!file) return
+    
+        const formData = new FormData()
+        formData.append("file", file)
+    
+        try {
+            setLoading(true)
+            await api.post(`/templates/${id}/upload`, formData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            })
+            fetchTemplate()
+        } catch (err) {
+            setLoading(false)
+            guard.error(err.message)
+            console.error("Ошибка при загрузке файла", err)
         }
     }
 
@@ -155,8 +179,22 @@ const Template = () => {
                         </Box>
                     </Card>
                     <Card variant="outlined">
-                        <Box sx={{ px: 2, pt: 2 }}>
+                        <Box sx={{ px: 2, pt: 2 }} display={'flex'} justifyContent={'space-between'}>
                             <Typography component={'div'} variant='h5'>Версии</Typography>
+                            {template.owns && (
+                                <>
+                                    <input
+                                        type="file"
+                                        accept="*/*"
+                                        ref={fileInputRef}
+                                        style={{ display: 'none' }}
+                                        onChange={handleUpload}
+                                    />
+                                    <Button onClick={() => fileInputRef.current.click()}>
+                                        Загрузить
+                                    </Button>
+                                </>
+                            )}
                         </Box>
 
                         <TableContainer>

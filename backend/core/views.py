@@ -153,6 +153,34 @@ def template_versions_create(request):
 
 @csrf_exempt
 @api_view(["POST"])
+def template_upload_version(request, id):
+    user, error = get_user_from_token(request)
+    if error:
+        return error
+    template = get_object_or_404(Template, id=id, user_id=user.id)
+    uploaded_file = request.FILES.get('file')
+    if not uploaded_file:
+        return Response(
+            {"detail": "Не передан файл (ожидается ключ 'file')"},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    template_version = TemplateVersion.objects.create(
+        file=uploaded_file
+    )
+    try:
+        remote_id = upload_to_fr_cloud(template_version.file, f"template_{template_version.id}")
+        export_id = export_to_image(remote_id)
+        export_id = wait_for_export(export_id)
+        image_content = download_export(export_id)
+        preview_name = f"preview_{template_version.id}.png"
+        template_version.preview_file.save(preview_name, ContentFile(image_content))
+        template_version.template_id=template.id
+        template_version.save()
+        return Response(TemplateSerializer(template, context={"user": user}).data)
+    except Exception as e:
+        return Response({"detail": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+@csrf_exempt
+@api_view(["POST"])
 def template_versions_build(request, id):
     _, error = get_user_from_token(request)
     if error:
