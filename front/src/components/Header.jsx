@@ -15,11 +15,12 @@ export function Header() {
     <AppBar position="static" sx={{ mb: 4 }}>
       <Toolbar>
         <Typography
+          sx={{ flexGrow: 1 }}
           variant="h6"
-          sx={{ flexGrow: 1, cursor: 'pointer' }}
-          onClick={() => route('/')}
         >
-          Каталог шаблонов
+          <span style="cursor: pointer" onClick={() => route('/')}>
+            Каталог шаблонов
+          </span>
         </Typography>
 
         {user ? (

@@ -93,12 +93,12 @@ const Template = () => {
                 </Grid2>
             </Grid2>
             <Dialog open={open} onClose={() => setOpen(false)} maxWidth="xl" fullWidth>
-            <DialogContent sx={{ position: 'relative', p: 0,  }}>
-                <IconButton onClick={() => setOpen(false)} sx={{ position: 'absolute', top: 8, right: 8,}}>
-                x
-                </IconButton>
-                <img src={template.preview_url} style={{ width: '100%', height: '100%', objectFit: 'contain' }}/>
-            </DialogContent>
+                <DialogContent sx={{ position: 'relative', p: 0,  }}>
+                    <IconButton onClick={() => setOpen(false)} sx={{ position: 'absolute', top: 8, right: 8,}}>
+                    x
+                    </IconButton>
+                    <img src={template.preview_url} style={{ width: '100%', height: '100%', objectFit: 'contain' }}/>
+                </DialogContent>
             </Dialog>
         </Container>
     )

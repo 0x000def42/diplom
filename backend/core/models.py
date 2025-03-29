@@ -54,6 +54,8 @@ class Template(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    user = models.ForeignKey(ExternalUser, on_delete=models.SET_NULL, related_name='templates', null=True, blank=True)
+
 
     def upload_to_fr_cloud(self):
         """Загружает файл в FastReport Cloud и возвращает remote_id"""
@@ -126,3 +128,8 @@ class Template(models.Model):
         export_id = self.export_to_image(remote_id)
         export_id = self.wait_for_export(export_id)
         self.download_export(export_id)
+
+class TemplateVersion(models.Model):
+    file = models.FileField(upload_to="templates/")
+    preview_file = models.FileField(upload_to="previews/", null=True, blank=True)
+    template = models.ForeignKey(Template, on_delete=models.SET_NULL, related_name='versions', null=True, blank=True)

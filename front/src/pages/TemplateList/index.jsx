@@ -8,6 +8,8 @@ import { styled } from '@mui/system';
 import api from '@/utils/api.js';
 import TemplateGrid from './TemplateGrid';
 import { useGlobalStore } from '@/store';
+import guard from '@/utils/guard';
+import { useLocation } from 'preact-iso';
 
 const MainContainer = styled(Container)({
   display: 'flex',
@@ -28,6 +30,16 @@ const TemplateList = () => {
   const showOnlyFavorites = useGlobalStore((s) => s.showOnlyFavorites);
   const toggleFavoritesFilter = useGlobalStore((s) => s.toggleFavoritesFilter);
 
+  const {route} = useLocation()
+
+  const clickUpload = () => {
+    if(user){
+      route("/templates/upload")
+    } else {
+      guard.unauthorized()
+    }
+  }
+
   useEffect(() => {
     const fetchTemplates = async () => {
       const params = new URLSearchParams();
@@ -36,7 +48,7 @@ const TemplateList = () => {
         params.set("favoritesOnly", "true");
       }
 
-      const url = `/templates/?${params.toString()}`;
+      const url = `/templates?${params.toString()}`;
       const response = await api.get(url);
       setTemplates(response.data);
     };
@@ -57,11 +69,12 @@ const TemplateList = () => {
 
   return (
     <MainContainer>
-      <Grid2 size={4}>
+      <Grid2 size={12} sx={{pb: 3, display: 'flex', justifyContent: 'space-between'}}>
         <FormControlLabel
           control={<Checkbox checked={showOnlyFavorites} onChange={toggleFavoritesFilter} />}
           label={`Только избранное (${meta.favorites})`}
         />
+        <Button onClick={clickUpload} variant="outlined">Загрузить +</Button>
       </Grid2>
 
       {templates.length === 0 ? (
