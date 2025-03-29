@@ -132,4 +132,5 @@ class Template(models.Model):
 class TemplateVersion(models.Model):
     file = models.FileField(upload_to="templates/")
     preview_file = models.FileField(upload_to="previews/", null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
     template = models.ForeignKey(Template, on_delete=models.SET_NULL, related_name='versions', null=True, blank=True)

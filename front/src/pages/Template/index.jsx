@@ -1,5 +1,5 @@
 import api from '@/utils/api';
-import { Container, CircularProgress, Grid2, Typography, DialogContent, Dialog, IconButton, CardMedia, Box, Card, Chip, Divider, Stack, Tooltip, TextField, Button } from '@mui/material';
+import { Container, CircularProgress, Grid2, Typography, DialogContent, Dialog, IconButton, CardMedia, Box, Card, Chip, Divider, Stack, Tooltip, TextField, Button, Table, TableCell, TableContainer, TableHead, TableRow, TableBody } from '@mui/material';
 import { useRoute } from 'preact-iso/router';
 import { Description, Edit as EditIcon, Logout as LogoutIcon, Save as SaveIcon } from '@mui/icons-material';
 import { useEffect, useState } from 'preact/hooks';
@@ -85,8 +85,8 @@ const Template = () => {
                     }}
                 />
                 </Grid2>
-                <Grid2 size={6}>
-                    <Card variant="outlined">
+                <Grid2 size={8}>
+                    <Card variant="outlined" sx={{mb: 2}}>
                         <Box sx={{ p: 2 }}>
                             { !editing ? (
                                 <>
@@ -153,6 +153,41 @@ const Template = () => {
                             </Tooltip>
                         </Stack>
                         </Box>
+                    </Card>
+                    <Card variant="outlined">
+                        <Box sx={{ px: 2, pt: 2 }}>
+                            <Typography component={'div'} variant='h5'>Версии</Typography>
+                        </Box>
+
+                        <TableContainer>
+                            <Table sx={{ minWidth: 650 }} aria-label="simple table">
+                                <TableHead>
+                                    <TableRow>
+                                        <TableCell>Дата</TableCell>
+                                        <TableCell>Файл</TableCell>
+                                        <TableCell align="right">#</TableCell>
+                                    </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                    {template.versions.map((row) => (
+                                        <TableRow
+                                            key={row.id}
+                                            sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                                        >
+                                        <TableCell scope="row">
+                                            {row.createdAt}
+                                        </TableCell>
+                                        <TableCell>{row.fileName}</TableCell>
+                                        <TableCell align="right">
+                                        <IconButton component="a" href={row.file_url} download target="_blank" rel="noopener noreferrer" size="small" color="primary">
+                                            <DownloadIcon />
+                                        </IconButton>
+                                        </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
                     </Card>
                 </Grid2>
             </Grid2>
