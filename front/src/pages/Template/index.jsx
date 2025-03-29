@@ -1,12 +1,14 @@
 import api from '@/utils/api';
 import { Container, CircularProgress, Grid2, Typography, DialogContent, Dialog, IconButton, CardMedia, Box, Card, Divider, Stack, Tooltip, TextField, Button, Table, TableCell, TableContainer, TableHead, TableRow, TableBody } from '@mui/material';
-import { useRoute } from 'preact-iso/router';
+import { useLocation, useRoute } from 'preact-iso/router';
 import { Edit as EditIcon, Logout as LogoutIcon, Save as SaveIcon } from '@mui/icons-material';
 import { useEffect, useState } from 'preact/hooks';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import DownloadIcon from '@mui/icons-material/Download';
 import { useRef } from 'preact/hooks';
 import guard from '@/utils/guard';
+import { Delete as DeleteIcon } from '@mui/icons-material';
+import { DialogTitle, DialogActions } from '@mui/material';
 
 const Template = () => {
     const { params: {id} } = useRoute();
@@ -15,11 +17,16 @@ const Template = () => {
     const [open, setOpen] = useState(false);
     const [liked, setLiked] = useState(false);
 
+    const {route} = useLocation()
+
     const [editedName, setEditedName] = useState(null)
     const [editedDescription, setEditedDescription] = useState(null)
     const [editing, setEditing] = useState(false)
 
     const fileInputRef = useRef(null)
+
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [deleteConfirmInput, setDeleteConfirmInput] = useState('');
 
     const fetchTemplate = async () => {
         try {
@@ -94,6 +101,16 @@ const Template = () => {
         }
     }
 
+    const handleDelete = async () => {
+        try {
+          await api.delete(`/templates/${id}`)
+          route('/')
+        } catch (err) {
+            guard.error(err.message)
+            console.error('Ошибка удаления шаблона', err);
+        }
+    }
+
     return (
         <Container>
             <Grid2 container spacing={3}>
@@ -115,13 +132,17 @@ const Template = () => {
                             { !editing ? (
                                 <>
                                     <Typography gutterBottom variant="h5" component="div">
-                                    { template.owns && (
-                                        <IconButton sx={{mr: 1}} onClick={() => setEditing(true)} size="medium">
-                                            <EditIcon fontSize="small" />
-                                        </IconButton>
-                                    )}
-
                                         {template.name}
+                                        { template.owns && (
+                                            <>
+                                            <IconButton sx={{ml:1}} onClick={() => setEditing(true)} size="medium">
+                                                <EditIcon fontSize="small" />
+                                            </IconButton>
+                                            <IconButton onClick={() => setDeleteDialogOpen(true)} size="medium" color="error">
+                                                <DeleteIcon fontSize="small" />
+                                            </IconButton>
+                                            </>
+                                        )}
                                     </Typography>
                                     <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                                         {template.description}
@@ -237,6 +258,30 @@ const Template = () => {
                     <img src={template.preview_url} style={{ width: '100%', height: '100%', objectFit: 'contain' }}/>
                 </DialogContent>
             </Dialog>
+            <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)} maxWidth="sm" fullWidth>
+                <DialogTitle>Подтверждение удаления</DialogTitle>
+                <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                    <Typography>
+                    Для удаления шаблона введите его название <strong>{template.name}</strong> ниже:
+                    </Typography>
+                    <TextField
+                    label="Название шаблона"
+                    value={deleteConfirmInput}
+                    onChange={(e) => setDeleteConfirmInput(e.currentTarget.value)}
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setDeleteDialogOpen(false)}>Отмена</Button>
+                    <Button
+                    variant="contained"
+                    color="error"
+                    disabled={deleteConfirmInput !== template.name}
+                    onClick={handleDelete}
+                    >
+                    Удалить
+                    </Button>
+                </DialogActions>
+                </Dialog>
         </Container>
     )
 }

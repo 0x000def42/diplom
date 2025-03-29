@@ -96,6 +96,14 @@ class TemplateView(APIView):
         user, error = get_user_from_token(request)
         return Response(TemplateSerializer(template, context={"user": user}).data)
 
+    def delete(self, request, id):
+        user, error = get_user_from_token(request)
+        if error:
+            return error
+        template = get_object_or_404(Template, id=id, user_id=user.id)
+        template.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
     def put(self, request, id):
         user, error = get_user_from_token(request)
         if error:
