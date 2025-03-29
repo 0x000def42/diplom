@@ -14,11 +14,13 @@ const Layout = ({ children }) => {
     // @ts-ignore
     api.onUnauthorized(() => showSnackbar("Сначала авторизуйтесь"))
     guard.onUnauthorized(() => showSnackbar("Сначала авторизуйтесь"))
+    guard.onError((err) => showSnackbar(err))
 
     return () => {
       // @ts-ignore
       api.onUnauthorized(() => {});
       guard.onUnauthorized(() => {})
+      guard.onError(() => {})
     }
   }, [])
   

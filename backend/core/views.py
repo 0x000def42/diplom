@@ -46,6 +46,7 @@ class TemplatesView(APIView):
     def get(self, request):
         query = request.GET.get("query", "")
         favorites_only = request.GET.get("favoritesOnly") == "true"
+        my_only = request.GET.get("myOnly") == "true"
 
         user, _ = get_user_from_token(request)
 
@@ -53,6 +54,9 @@ class TemplatesView(APIView):
 
         if favorites_only and user:
             qs = qs.filter(liked_by=user)
+
+        if my_only and user:
+            qs = qs.filter(user=user)
 
         return Response(TemplateListSerializer(qs, many=True).data)
     
@@ -79,15 +83,42 @@ class TemplatesView(APIView):
 def template_list_meta(request):
     user, error = get_user_from_token(request)  
     if error:
-        return Response({"favorites": 0})
+        return Response({"favorites": 0, "my": 0})
 
-    return Response({"favorites": user.likes.count()})
+    return Response({
+        "favorites": user.likes.count(),
+        "my": user.templates.count()
+    })
 
-@api_view(["GET"])
-def template_get(request, id):
-    template = get_object_or_404(Template, id=id)
-    user, error = get_user_from_token(request)
-    return Response(TemplateSerializer(template, context={"user": user}).data)
+class TemplateView(APIView):
+    def get(self, request, id):
+        template = get_object_or_404(Template, id=id)
+        user, error = get_user_from_token(request)
+        return Response(TemplateSerializer(template, context={"user": user}).data)
+
+    def delete(self, request, id):
+        user, error = get_user_from_token(request)
+        if error:
+            return error
+        template = get_object_or_404(Template, id=id, user_id=user.id)
+        template.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    def put(self, request, id):
+        user, error = get_user_from_token(request)
+        if error:
+            return error
+        template = get_object_or_404(Template, id=id, user_id=user.id)
+
+        name = request.data.get("name", "").strip()
+        description = request.data.get("description", "").strip()
+        if not name or not description:
+            return Response({"error": "Name is required, Description is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        template.name = name
+        template.description = description
+        template.save()
+        return Response(TemplateSerializer(template, context={"user": user}).data)
 
 @api_view(["GET"])
 def template_download(request, id):
@@ -128,6 +159,34 @@ def template_versions_create(request):
     )
     return Response({"id": version.id})
 
+@csrf_exempt
+@api_view(["POST"])
+def template_upload_version(request, id):
+    user, error = get_user_from_token(request)
+    if error:
+        return error
+    template = get_object_or_404(Template, id=id, user_id=user.id)
+    uploaded_file = request.FILES.get('file')
+    if not uploaded_file:
+        return Response(
+            {"detail": "Не передан файл (ожидается ключ 'file')"},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    template_version = TemplateVersion.objects.create(
+        file=uploaded_file
+    )
+    try:
+        remote_id = upload_to_fr_cloud(template_version.file, f"template_{template_version.id}")
+        export_id = export_to_image(remote_id)
+        export_id = wait_for_export(export_id)
+        image_content = download_export(export_id)
+        preview_name = f"preview_{template_version.id}.png"
+        template_version.preview_file.save(preview_name, ContentFile(image_content))
+        template_version.template_id=template.id
+        template_version.save()
+        return Response(TemplateSerializer(template, context={"user": user}).data)
+    except Exception as e:
+        return Response({"detail": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 @csrf_exempt
 @api_view(["POST"])
 def template_versions_build(request, id):

@@ -30,6 +30,9 @@ const TemplateList = () => {
   const showOnlyFavorites = useGlobalStore((s) => s.showOnlyFavorites);
   const toggleFavoritesFilter = useGlobalStore((s) => s.toggleFavoritesFilter);
 
+  const showOnlyMy = useGlobalStore((s) => s.showOnlyMy);
+  const toggleMyFilter = useGlobalStore((s) => s.toggleMyFilter);
+
   const {route} = useLocation()
 
   const clickUpload = () => {
@@ -47,13 +50,16 @@ const TemplateList = () => {
       if (showOnlyFavorites) {
         params.set("favoritesOnly", "true");
       }
+      if (showOnlyMy) {
+        params.set("myOnly", "true");
+      }
 
       const url = `/templates?${params.toString()}`;
       const response = await api.get(url);
       setTemplates(response.data);
     };
     fetchTemplates();
-  }, [searchTerm, showOnlyFavorites]);
+  }, [searchTerm, showOnlyFavorites, showOnlyMy]);
 
   useEffect(() => {
     const fetchTemplatesMeta = async () => {
@@ -70,10 +76,16 @@ const TemplateList = () => {
   return (
     <MainContainer>
       <Grid2 size={12} sx={{pb: 3, display: 'flex', justifyContent: 'space-between'}}>
-        <FormControlLabel
-          control={<Checkbox checked={showOnlyFavorites} onChange={toggleFavoritesFilter} />}
-          label={`Только избранное (${meta.favorites})`}
-        />
+        <div>
+          <FormControlLabel
+            control={<Checkbox checked={showOnlyFavorites} onChange={toggleFavoritesFilter} />}
+            label={`Только избранное (${meta.favorites})`}
+          />
+          <FormControlLabel
+            control={<Checkbox checked={showOnlyMy} onChange={toggleMyFilter} />}
+            label={`Только мои (${meta.my})`}
+          />
+        </div>
         <Button onClick={clickUpload} variant="outlined">Загрузить +</Button>
       </Grid2>
 
