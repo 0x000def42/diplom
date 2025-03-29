@@ -17,15 +17,22 @@ class TemplateListSerializer(serializers.ModelSerializer):
         
 class TemplateSerializer(TemplateListSerializer):
     liked = serializers.SerializerMethodField()
+    owns = serializers.SerializerMethodField()
 
     class Meta(TemplateListSerializer.Meta):
-        fields = TemplateListSerializer.Meta.fields + ["liked"]
+        fields = TemplateListSerializer.Meta.fields + ["liked", "owns"]
 
     def get_liked(self, obj):
         user = self.context.get("user")
         if not user:
             return False
         return obj.liked_by.filter(id=user.id).exists()
+    
+    def get_owns(self, obj):
+        user = self.context.get("user")
+        if not user:
+            return False
+        return obj.user_id == user.id
 
 class ReviewSerializer(serializers.ModelSerializer):
     class Meta:

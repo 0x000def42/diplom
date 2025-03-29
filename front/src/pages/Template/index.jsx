@@ -1,6 +1,7 @@
 import api from '@/utils/api';
-import { Container, CircularProgress, Grid2, Typography, DialogContent, Dialog, IconButton, CardMedia, Box, Card, Chip, Divider, Stack, Tooltip } from '@mui/material';
+import { Container, CircularProgress, Grid2, Typography, DialogContent, Dialog, IconButton, CardMedia, Box, Card, Chip, Divider, Stack, Tooltip, TextField, Button } from '@mui/material';
 import { useRoute } from 'preact-iso/router';
+import { Description, Edit as EditIcon, Logout as LogoutIcon, Save as SaveIcon } from '@mui/icons-material';
 import { useEffect, useState } from 'preact/hooks';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import DownloadIcon from '@mui/icons-material/Download';
@@ -12,19 +13,26 @@ const Template = () => {
     const [open, setOpen] = useState(false);
     const [liked, setLiked] = useState(false);
 
-    useEffect(() => {
-        const fetchTemplate = async () => {
-            try {
-                const response = await api.get(`/templates/${id}`)
-                setTemplate(response.data)
-                setLiked(response.data.liked);
-                setLoading(false)
-            } catch (err) {
-                console.error("Ошибка при получении шаблона", err)
-            } finally {
-                setLoading(false)
-            }
+    const [editedName, setEditedName] = useState(null)
+    const [editedDescription, setEditedDescription] = useState(null)
+    const [editing, setEditing] = useState(false)
+
+    const fetchTemplate = async () => {
+        try {
+            const response = await api.get(`/templates/${id}`)
+            setTemplate(response.data)
+            setEditedDescription(response.data.description)
+            setEditedName(response.data.name)
+            setLiked(response.data.liked)
+            setLoading(false)
+        } catch (err) {
+            console.error("Ошибка при получении шаблона", err)
+        } finally {
+            setLoading(false)
         }
+    }
+
+    useEffect(() => {
         fetchTemplate()
     }, [])
 
@@ -48,6 +56,20 @@ const Template = () => {
     }
     if (!template) return null
 
+    const handleSave = async () => {
+        try {
+            const response = await api.put(`/templates/${id}`, {
+                name: editedName,
+                description: editedDescription
+            })
+            setLoading(true)
+            setEditing(false)
+            fetchTemplate()
+        } catch(err) {
+            console.error("Не удалось сохранить шаблон", err)
+        }
+    }
+
     return (
         <Container>
             <Grid2 container spacing={3}>
@@ -66,12 +88,54 @@ const Template = () => {
                 <Grid2 size={6}>
                     <Card variant="outlined">
                         <Box sx={{ p: 2 }}>
-                            <Typography gutterBottom variant="h5" component="div">
-                                {template.name}
-                            </Typography>
-                            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                                {template.description}
-                            </Typography>
+                            { !editing ? (
+                                <>
+                                    <Typography gutterBottom variant="h5" component="div">
+                                    { template.owns && (
+                                        <IconButton sx={{mr: 1}} onClick={() => setEditing(true)} size="medium">
+                                            <EditIcon fontSize="small" />
+                                        </IconButton>
+                                    )}
+
+                                        {template.name}
+                                    </Typography>
+                                    <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                                        {template.description}
+                                    </Typography>
+                                </>) : (
+                                    <>
+                                        <Box sx={{ display: 'flex', flexDirection: "column" , gap: 2 }}>
+                                            <TextField
+                                                fullWidth
+                                                label="Название"
+                                                value={editedName}
+                                                onChange={(e) => setEditedName(e.currentTarget.value)}
+                                            />
+
+                                            <TextField
+                                                fullWidth
+                                                multiline
+                                                minRows={4}
+                                                label="Описание"
+                                                value={editedDescription}
+                                                onChange={(e) => setEditedDescription(e.currentTarget.value)}
+                                            />
+                                            <Button
+                                                onClick={() => { handleSave() }}
+                                                variant="contained"
+                                                startIcon={<SaveIcon />}
+                                            >
+                                                Сохранить
+                                            </Button>
+                                            <Button
+                                                onClick={() => { setEditing(false) }}
+                                            >
+                                                Отмена
+                                            </Button>
+                                        </Box>
+                                    </>
+                                )
+                            }
                         </Box>
                         <Divider />
                         <Box sx={{ p: 2 }}>

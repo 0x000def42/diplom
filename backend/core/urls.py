@@ -4,7 +4,7 @@ from . import views as v
 urlpatterns = [
     path("templates", v.TemplatesView.as_view(), name="template_list"),
     path("templates/meta", v.template_list_meta),
-    path("templates/<int:id>", v.template_get),
+    path("templates/<int:id>", v.TemplateView.as_view()),
     path("templates/<int:id>/download/", v.template_download, name="template_download"),
     path("templates/<int:id>/like", v.toggle_like),
     path("template_versions", v.template_versions_create),

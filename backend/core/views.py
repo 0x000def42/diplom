@@ -46,6 +46,7 @@ class TemplatesView(APIView):
     def get(self, request):
         query = request.GET.get("query", "")
         favorites_only = request.GET.get("favoritesOnly") == "true"
+        my_only = request.GET.get("myOnly") == "true"
 
         user, _ = get_user_from_token(request)
 
@@ -53,6 +54,9 @@ class TemplatesView(APIView):
 
         if favorites_only and user:
             qs = qs.filter(liked_by=user)
+
+        if my_only and user:
+            qs = qs.filter(user=user)
 
         return Response(TemplateListSerializer(qs, many=True).data)
     
@@ -79,15 +83,34 @@ class TemplatesView(APIView):
 def template_list_meta(request):
     user, error = get_user_from_token(request)  
     if error:
-        return Response({"favorites": 0})
+        return Response({"favorites": 0, "my": 0})
 
-    return Response({"favorites": user.likes.count()})
+    return Response({
+        "favorites": user.likes.count(),
+        "my": user.templates.count()
+    })
 
-@api_view(["GET"])
-def template_get(request, id):
-    template = get_object_or_404(Template, id=id)
-    user, error = get_user_from_token(request)
-    return Response(TemplateSerializer(template, context={"user": user}).data)
+class TemplateView(APIView):
+    def get(self, request, id):
+        template = get_object_or_404(Template, id=id)
+        user, error = get_user_from_token(request)
+        return Response(TemplateSerializer(template, context={"user": user}).data)
+
+    def put(self, request, id):
+        user, error = get_user_from_token(request)
+        if error:
+            return error
+        template = get_object_or_404(Template, id=id, user_id=user.id)
+
+        name = request.data.get("name", "").strip()
+        description = request.data.get("description", "").strip()
+        if not name or not description:
+            return Response({"error": "Name is required, Description is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        template.name = name
+        template.description = description
+        template.save()
+        return Response(TemplateSerializer(template, context={"user": user}).data)
 
 @api_view(["GET"])
 def template_download(request, id):
