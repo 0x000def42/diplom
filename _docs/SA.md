@@ -207,5 +207,60 @@ catalog --> cloud: UPLOAD_REQUEST
 catalog --> cloud: EXPORT_REQUEST
 catalog --> cloud: STATUS_REQUEST
 catalog --> cloud: DOWNLOAD_REQUEST
+```
+
+```plantuml
+@startuml
+!define Table(name,desc) class name as "desc" << (T,#FFAAAA) >>
+hide methods
+' hide stereotypes
+
+Table(core_review, "core_review") {
+  id: integer
+  email: text
+  title: text
+  body: text
+  created_at: datetime
+}
+
+Table(core_template, "core_template") {
+  id: integer
+  name: text
+  description: text
+  preview_file: text
+  file: text
+  created_at: datetime
+  updated_at: datetime
+  user_id: bigint
+}
+
+Table(core_externaluser, "core_externaluser") {
+  id: integer
+  external_id: text
+  provider: text
+  email: text
+  name: text
+}
+
+Table(core_externaluser_likes, "core_externaluser_likes") {
+  id: integer
+  externaluser_id: bigint
+  template_id: bigint
+}
+
+Table(core_templateversion, "core_templateversion") {
+  id: integer
+  file: text
+  preview_file: text
+  template_id: bigint
+  created_at: datetime
+}
+
+core_template --> core_externaluser : user_id → id
+core_externaluser_likes --> core_externaluser : externaluser_id → id
+core_externaluser_likes --> core_template : template_id → id
+core_templateversion --> core_template : template_id → id
+
+@enduml
 
 ```

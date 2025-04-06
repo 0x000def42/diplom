@@ -18,21 +18,33 @@ const TemplateGrid = ({templates}) => {
             <Grid2 container spacing={3}>
             {templates.map((item) => (
                 <Grid2 size={4} key={item.id}>
-                    <Card sx={{ boxShadow: 3 }}>
+                   <Card sx={{ display: 'flex', flexDirection: 'column', height: '100%', boxShadow: 3 }}>
                         <ImageContaner onClick={() => route(`/templates/${item.id}`)}>
-                        <CardMedia
+                            <CardMedia
                             component="img"
                             image={item.preview_url}
                             alt={item.name}
                             sx={{ height: 300, objectFit: 'contain' }}
-                        />
+                            />
                         </ImageContaner>
-                        <CardContent>
-                        <Typography variant="h6">{item.name}</Typography>
-                        <Typography variant="body2" color="text.secondary">
+                        <CardContent sx={{ flexGrow: 1 }}>
+                            <Typography variant="h6">{item.name}</Typography>
+                            <Typography
+                            variant="body2"
+                            color="text.secondary"
+                            sx={{
+                                display: '-webkit-box',
+                                WebkitLineClamp: 3,
+                                WebkitBoxOrient: 'vertical',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                            }}
+                            >
                             {item.description}
-                        </Typography>
-                        <Button
+                            </Typography>
+                        </CardContent>
+                        <CardContent sx={{ pt: 0 }}>
+                            <Button
                             component="a"
                             href={item.file_url}
                             download
@@ -40,12 +52,12 @@ const TemplateGrid = ({templates}) => {
                             rel="noopener noreferrer"
                             variant="contained"
                             color="primary"
-                            sx={{ mt: 2 }}
-                        >
+                            sx={{ mt: 'auto' }}
+                            >
                             Скачать
-                        </Button>
+                            </Button>
                         </CardContent>
-                    </Card>
+                        </Card>
                 </Grid2>
             ))}
         </Grid2>

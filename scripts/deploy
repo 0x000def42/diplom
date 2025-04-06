@@ -1,13 +1,16 @@
 #!/bin/bash
 
-ssh root@37.252.21.85 << 'EOF'
+ssh root@37.252.21.85 << EOF
     cd ~/diplom
     git pull origin main
+
     cd ~/diplom/front
     npm install
     npm run build
+
     cd ~/diplom/backend
     source venv/bin/activate
+
     pkill -f "python manage.py runserver" || true
     pip install -r requirements.txt
     python manage.py migrate
