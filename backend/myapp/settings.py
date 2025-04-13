@@ -67,6 +67,7 @@ CORS_ALLOW_CREDENTIALS = True
 
 CSRF_TRUSTED_ORIGINS = [
     "http://37.252.21.85",
+    "http://xdef42.ru",
 ]
 
 REST_FRAMEWORK = {
