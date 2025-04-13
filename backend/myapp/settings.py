@@ -27,8 +27,9 @@ SECRET_KEY = 'django-insecure-ol&-#3r23#b_*lh)+^)h!dauaw$81p-&(5+xj-3mp%qm=xx*do
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    'localhost',
-    '37.252.21.85'
+    '127.0.0.1',
+    '37.252.21.85',
+    'xdef42'
 ]
 MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
@@ -50,6 +51,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'myapp.middleware.MyMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.security.SecurityMiddleware',
