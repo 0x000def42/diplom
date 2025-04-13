@@ -8,5 +8,5 @@ class MyMiddleware:
         host = request.get_host().split(':')[0]
         print(host)
         if host == '37.252.21.85':
-            return HttpResponsePermanentRedirect(f'https://xdef42.ru{request.get_full_path()}')
+            return HttpResponsePermanentRedirect(f'http://xdef42.ru{request.get_full_path()}')
         return self.get_response(request)
